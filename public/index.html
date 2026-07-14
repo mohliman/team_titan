@@ -1,0 +1,1349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Real-Time Cement Production Intelligence Platform</title>
+  <style>
+    :root {
+      --bg: #f3f5f1;
+      --panel: #fff;
+      --ink: #17221e;
+      --muted: #637068;
+      --line: #dbe1d8;
+      --green: #2d7b5f;
+      --amber: #b56b16;
+      --red: #b54134;
+      --blue: #385f96;
+      --teal: #2a7886;
+      --dark: #202b27;
+      --shadow: 0 16px 42px rgba(28, 42, 36, .12);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+    }
+
+    aside {
+      background: var(--dark);
+      color: #f6faf6;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255,255,255,.14);
+    }
+
+    .mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #111;
+      background: linear-gradient(135deg, #e3bc5e, #d96e48 48%, #4b8793);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 18px; line-height: 1.1; margin-bottom: 3px; }
+    .brand span, .muted { color: var(--muted); }
+    aside .brand span, aside .muted { color: #cbd6cf; }
+
+    .side-card {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .side-card h2 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #d5ded8;
+      margin-bottom: 12px;
+    }
+
+    .kv {
+      display: grid;
+      gap: 9px;
+      font-size: 13px;
+    }
+
+    .kv div {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding-bottom: 7px;
+    }
+
+    .kv strong { text-align: right; }
+    main { padding: 22px; display: grid; gap: 16px; }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .top h2 {
+      font-size: clamp(24px, 3vw, 36px);
+      margin-bottom: 5px;
+      letter-spacing: 0;
+    }
+
+    .top p {
+      color: var(--muted);
+      max-width: 780px;
+      line-height: 1.45;
+      margin-bottom: 0;
+    }
+
+    .live {
+      min-width: 230px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      padding: 13px 14px;
+    }
+
+    .live strong { display: block; font-size: 21px; }
+    .live span { color: var(--muted); font-size: 12px; }
+
+    .view-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .view-tabs button {
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel);
+      color: #34423c;
+      padding: 0 13px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .view-tabs button.active {
+      background: var(--dark);
+      border-color: var(--dark);
+      color: #fff;
+    }
+
+    .view { display: none; }
+    .view.active {
+      display: grid;
+      gap: 16px;
+    }
+
+    .home-grid {
+      grid-template-columns: minmax(360px, 1.1fr) minmax(320px, .9fr);
+      align-items: stretch;
+    }
+
+    .condition {
+      min-height: 320px;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      align-content: space-between;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .condition .eyebrow {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .condition h3 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .condition p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.45;
+      max-width: 620px;
+    }
+
+    .simple-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 10px;
+    }
+
+    .simple-metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8faf6;
+    }
+
+    .simple-metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .simple-metric strong {
+      font-size: clamp(22px, 3vw, 34px);
+      line-height: 1;
+    }
+
+    .action-card {
+      min-height: 320px;
+    }
+
+    .action-list {
+      padding: 14px 16px 16px;
+      display: grid;
+      gap: 11px;
+    }
+
+    .plain-action {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 11px;
+      border-radius: 8px;
+      background: #f7faf6;
+      border: 1px solid #e3e8df;
+    }
+
+    .plain-action i {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--teal);
+      color: #fff;
+      font-style: normal;
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .plain-action strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .plain-action span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .mini-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 12px;
+    }
+
+    .bridge-bars {
+      padding: 12px 16px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .bridge-row {
+      display: grid;
+      grid-template-columns: minmax(160px, .75fr) minmax(120px, auto);
+      gap: 7px 12px;
+      align-items: center;
+    }
+
+    .bridge-row strong {
+      font-size: 13px;
+    }
+
+    .bridge-row span {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .bridge-note {
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .compact-table {
+      padding: 12px 16px 16px;
+      overflow: auto;
+    }
+
+    .framework-list {
+      padding: 12px 16px 16px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .framework-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid #e3e8df;
+      padding: 8px 0;
+      font-size: 13px;
+    }
+
+    .framework-line span {
+      color: var(--muted);
+    }
+
+    .framework-line strong {
+      text-align: right;
+    }
+
+    .grid { display: grid; gap: 14px; }
+    .metrics { grid-template-columns: repeat(5, minmax(150px, 1fr)); }
+    .two { grid-template-columns: minmax(380px, 1.3fr) minmax(320px, .7fr); align-items: start; }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .metric {
+      padding: 15px;
+      min-height: 122px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .metric label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      font-size: clamp(25px, 3vw, 38px);
+      line-height: 1;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      width: fit-content;
+    }
+
+    .head {
+      padding: 15px 16px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .head h3 { font-size: 17px; margin-bottom: 0; }
+    .head span { color: var(--muted); font-size: 12px; }
+
+    .trend-controls {
+      padding: 12px 16px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trend-controls button {
+      border: 1px solid var(--line);
+      background: #eef3ec;
+      color: #34423c;
+      border-radius: 7px;
+      min-height: 32px;
+      padding: 0 11px;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .trend-controls button.active {
+      background: var(--dark);
+      color: #fff;
+      border-color: var(--dark);
+    }
+
+    .trend-controls span {
+      color: var(--muted);
+      font-size: 12px;
+      margin-left: auto;
+    }
+
+    .chart { height: 330px; padding: 12px 14px 16px; }
+    canvas { width: 100%; height: 100%; display: block; }
+
+    .list {
+      padding: 12px 16px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .item {
+      border-left: 4px solid var(--teal);
+      background: #f7faf6;
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .item strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 3px;
+    }
+
+    .item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .driver {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 7px 12px;
+      align-items: center;
+    }
+
+    .driver strong { font-size: 13px; }
+    .driver span { font-size: 12px; color: var(--muted); }
+    .bar { grid-column: 1 / -1; height: 8px; background: #e8ede4; border-radius: 99px; overflow: hidden; }
+    .bar i { display: block; height: 100%; background: var(--teal); }
+
+    .table-wrap { overflow: auto; max-height: 330px; border-top: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 1040px; font-size: 13px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #e3e8df; text-align: left; white-space: nowrap; }
+    th { position: sticky; top: 0; background: #eef3ec; z-index: 1; }
+
+    @media (max-width: 1060px) {
+      .shell { grid-template-columns: 1fr; }
+      aside { position: static; height: auto; }
+      .metrics, .two, .home-grid, .mini-strip, .simple-metrics { grid-template-columns: 1fr; }
+      .top { flex-direction: column; align-items: stretch; }
+      .live { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand">
+        <div class="mark">24</div>
+        <div>
+          <h1>Cement Production Intelligence</h1>
+          <span>Quality and conversion monitoring</span>
+        </div>
+      </div>
+
+      <section class="side-card">
+        <h2>Connection</h2>
+        <div class="kv">
+          <div><span>Source</span><strong id="sourceMode">--</strong></div>
+          <div><span>Health</span><strong id="healthText">--</strong></div>
+          <div><span>Last update</span><strong id="lastUpdate">--</strong></div>
+          <div><span>Records</span><strong id="recordCount">--</strong></div>
+        </div>
+      </section>
+
+      <section class="side-card">
+        <h2>Operating Limits</h2>
+        <div class="kv">
+          <div><span>Free lime high</span><strong id="freeLimeLimit">--</strong></div>
+          <div><span>Liter weight low</span><strong id="literWeightLimit">--</strong></div>
+          <div><span>Risk alert</span><strong id="riskLimit">--</strong></div>
+          <div><span>Warning horizon</span><strong id="horizon">--</strong></div>
+        </div>
+      </section>
+
+      <section class="side-card">
+        <h2>Integration Path</h2>
+        <div class="kv">
+          <div><span>Current</span><strong>Simulator</strong></div>
+          <div><span>Next</span><strong>OPC / PI / SQL</strong></div>
+          <div><span>SCADA mode</span><strong>Read only</strong></div>
+        </div>
+      </section>
+    </aside>
+
+    <main>
+      <section class="top">
+        <div>
+          <h2>Plant production status</h2>
+          <p>Plain-language view of clinker quality, cement conversion gap, live feed, and recommended actions for daily plant review.</p>
+        </div>
+        <div class="live">
+          <strong id="status">Starting...</strong>
+          <span>Current platform state</span>
+        </div>
+      </section>
+
+      <nav class="view-tabs" aria-label="Dashboard view">
+        <button type="button" class="active" data-view="homeView">Home status</button>
+        <button type="button" data-view="conversionView">Conversion bridge</button>
+        <button type="button" data-view="dashboardView">Clinker quality</button>
+      </nav>
+
+      <section class="view active" id="homeView">
+        <section class="grid home-grid">
+          <article class="condition" id="homeConditionCard">
+            <div>
+              <p class="eyebrow" id="homeHorizonLabel">Live condition</p>
+              <h3 id="homeCondition">Starting...</h3>
+              <p id="homeConditionText">Waiting for live plant quality and conversion prediction.</p>
+            </div>
+            <div class="simple-metrics">
+              <div class="simple-metric"><span>Free lime</span><strong id="homeFreeLime">--</strong></div>
+              <div class="simple-metric"><span>Liter weight</span><strong id="homeLiterWeight">--</strong></div>
+              <div class="simple-metric"><span>Off-spec risk</span><strong id="homeRisk">--</strong></div>
+              <div class="simple-metric"><span>Conversion gap</span><strong id="homeConversionGap">--</strong></div>
+            </div>
+          </article>
+
+          <article class="card action-card">
+            <div class="head"><h3>Recommended actions</h3><span id="homeActionLabel">Operator view</span></div>
+            <div class="action-list" id="homeActions"></div>
+          </article>
+        </section>
+
+        <section class="trend-controls" id="homeTrendControls">
+          <button type="button" class="active" data-minutes="0">Live forecast</button>
+          <button type="button" data-minutes="30">30 min</button>
+          <button type="button" data-minutes="60">1 hour</button>
+          <button type="button" data-minutes="90">1 hour 30 min</button>
+          <span id="homeTimeScaleLabel">Showing latest live condition</span>
+        </section>
+
+        <section class="mini-strip">
+          <article class="card metric"><label>Live feed <span class="pill" id="homeFeedPill">online</span></label><strong id="homeFeed">--</strong><span class="muted">Latest data received</span></article>
+          <article class="card metric"><label>Forecast horizon <span class="pill" style="background:var(--blue)">time</span></label><strong id="homeLeadTime">--</strong><span class="muted">Selected time scale</span></article>
+          <article class="card metric"><label>Confidence <span class="pill" id="homeConfidencePill">--</span></label><strong id="homeConfidence">--</strong><span class="muted">Trust in current signal</span></article>
+          <article class="card metric"><label>Main concern <span class="pill" id="homeConcernPill">driver</span></label><strong id="homeConcern">--</strong><span class="muted">Top quality or conversion issue</span></article>
+        </section>
+      </section>
+
+      <section class="view" id="conversionView">
+        <section class="top">
+          <div>
+            <h2>Clinker-to-cement conversion bridge</h2>
+            <p>Shows why available clinker and planned cement capacity may not become actual cement production. Values are cement-equivalent opportunity losses, not necessarily physical material losses.</p>
+          </div>
+          <div class="live">
+            <strong id="conversionStatus">--</strong>
+            <span>Conversion condition</span>
+          </div>
+        </section>
+
+        <section class="grid metrics">
+          <article class="card metric"><label>Expected cement <span class="pill" style="background:var(--blue)">target</span></label><strong id="expectedCement">--</strong><span class="muted">Daily production potential</span></article>
+          <article class="card metric"><label>Actual cement <span class="pill" id="actualCementPill">--</span></label><strong id="actualCement">--</strong><span class="muted">After constraints</span></article>
+          <article class="card metric"><label>Conversion gap <span class="pill" id="gapPill">--</span></label><strong id="conversionGap">--</strong><span class="muted">Lost cement opportunity</span></article>
+          <article class="card metric"><label>Efficiency <span class="pill" id="efficiencyPill">--</span></label><strong id="conversionEfficiency">--</strong><span class="muted">Actual vs expected</span></article>
+          <article class="card metric"><label>Top cause <span class="pill" id="topLossPill">loss</span></label><strong id="topLoss">--</strong><span class="muted">Largest bridge item</span></article>
+        </section>
+
+        <section class="grid two">
+          <article class="card">
+            <div class="head"><h3>Loss bridge</h3><span>cement-equivalent tons per day</span></div>
+            <div class="bridge-bars" id="lossBridge"></div>
+          </article>
+
+          <article class="card">
+            <div class="head"><h3>Conversion actions</h3><span>Owner-led checks</span></div>
+            <div class="list" id="conversionActions"></div>
+          </article>
+        </section>
+
+        <section class="grid two">
+          <article class="card">
+            <div class="head"><h3>Conversion framework</h3><span>clinker to cement potential</span></div>
+            <div class="framework-list" id="conversionFramework"></div>
+          </article>
+
+          <article class="card">
+            <div class="head"><h3>Daily plant review</h3><span>shift meeting summary</span></div>
+            <div class="list" id="dailyReview"></div>
+          </article>
+        </section>
+
+        <section class="grid two">
+          <article class="card">
+            <div class="head"><h3>Root-cause hypotheses</h3><span>by loss category</span></div>
+            <div class="compact-table">
+              <table>
+                <thead><tr><th>Loss</th><th>Owner</th><th>Likely root causes</th><th>Evidence to check</th><th>Recommended action</th></tr></thead>
+                <tbody id="lossTreeRows"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="head"><h3>Action plan</h3><span>owners by system</span></div>
+            <div class="compact-table">
+              <table>
+                <thead><tr><th>Owner</th><th>Action</th><th>Due</th><th>Status</th></tr></thead>
+                <tbody id="actionPlanRows"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <article class="card">
+          <div class="head"><h3>Current conversion variables</h3><span>Mill, silo, packing, dispatch, planning</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Runtime</th><th>Grinding rate</th><th>Clinker feed</th><th>Additives</th><th>Power</th><th>Silo use</th><th>Packing</th><th>Trucks</th><th>Planning</th></tr></thead>
+              <tbody id="conversionRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" id="dashboardView">
+      <section class="grid metrics">
+        <article class="card metric"><label>Free lime <span class="pill" id="flPill">--</span></label><strong id="freeLime">--</strong><span class="muted">Predicted chemical completion</span></article>
+        <article class="card metric"><label>Liter weight <span class="pill" id="lwPill">--</span></label><strong id="literWeight">--</strong><span class="muted">Predicted physical clinker quality</span></article>
+        <article class="card metric"><label>Off-spec risk <span class="pill" id="riskPill">--</span></label><strong id="risk">--</strong><span class="muted">Combined quality risk</span></article>
+        <article class="card metric"><label>Confidence <span class="pill" id="confidencePill">--</span></label><strong id="confidence">--</strong><span class="muted">Data quality and volume</span></article>
+        <article class="card metric"><label>Lead time <span class="pill" style="background:var(--blue)">forecast</span></label><strong id="leadTime">--</strong><span class="muted">Estimated warning horizon</span></article>
+      </section>
+
+      <section class="grid two">
+        <article class="card">
+          <div class="head"><h3>Live forecast trend</h3><span id="trendModeLabel">Last 144 predictions</span></div>
+          <div class="trend-controls" id="trendControls">
+            <button type="button" class="active" data-minutes="0">Live forecast</button>
+            <button type="button" data-minutes="30">30 min</button>
+            <button type="button" data-minutes="60">1 hour</button>
+            <button type="button" data-minutes="90">1 hour 30 min</button>
+            <span id="trendAxisLabel">X-axis: live prediction time | Y-axis: free lime %, scaled risk</span>
+          </div>
+          <div class="chart"><canvas id="trend" width="980" height="360"></canvas></div>
+        </article>
+
+        <article class="card">
+          <div class="head"><h3>Risk drivers</h3><span>Latest snapshot</span></div>
+          <div class="list" id="drivers"></div>
+        </article>
+      </section>
+
+      <section class="grid two">
+        <article class="card">
+          <div class="head"><h3>Recommendations</h3><span>Operator advisory</span></div>
+          <div class="list" id="recommendations"></div>
+        </article>
+
+        <article class="card">
+          <div class="head"><h3>Current SCADA values</h3><span>Mapped process variables</span></div>
+          <div class="list" id="processValues"></div>
+        </article>
+      </section>
+
+      <article class="card">
+        <div class="head"><h3>Prediction history</h3><span>Recent live records</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Time</th><th>Status</th><th>Free lime</th><th>Liter weight</th><th>Risk</th><th>Confidence</th><th>BZT</th><th>Feed</th><th>Fuel</th><th>Secondary air</th><th>LSF</th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let config = null;
+    let history = [];
+    let selectedForecastMinutes = 0;
+
+    const $ = id => document.getElementById(id);
+    const colors = { NORMAL: "var(--green)", WATCH: "var(--amber)", ALERT: "var(--red)", DATA_LOSS: "var(--red)" };
+
+    async function getJson(path) {
+      const response = await fetch(path, { cache: "no-store" });
+      if (!response.ok) throw new Error(`${path} failed`);
+      return response.json();
+    }
+
+    async function boot() {
+      config = await getJson("/api/config");
+      renderConfig();
+      await refresh();
+      setInterval(refresh, 3000);
+    }
+
+    async function refresh() {
+      try {
+        const [health, current, rows] = await Promise.all([
+          getJson("/api/health"),
+          getJson("/api/current"),
+          getJson("/api/history")
+        ]);
+        history = rows;
+        const trendRows = buildTrendRows(rows, selectedForecastMinutes);
+        const displayRow = trendRows[trendRows.length - 1] || current;
+        renderHealth(health);
+        renderCurrent(current, displayRow);
+        renderHome(displayRow, health);
+        renderConversion(current);
+        updateTrendControls();
+        drawTrend(trendRows);
+        drawTable(rows);
+      } catch (error) {
+        $("status").textContent = "Connection lost";
+        $("status").style.color = "var(--red)";
+        $("healthText").textContent = "Offline";
+      }
+    }
+
+    function renderConfig() {
+      $("sourceMode").textContent = config.source_mode;
+      $("freeLimeLimit").textContent = `${config.free_lime_high_limit_pct}%`;
+      $("literWeightLimit").textContent = `${config.liter_weight_low_limit_g_per_l} g/L`;
+      $("riskLimit").textContent = `${config.off_spec_risk_alert_pct}%`;
+      $("horizon").textContent = `${config.expected_warning_horizon_minutes} min`;
+    }
+
+    function renderHealth(health) {
+      $("healthText").textContent = health.ok ? "Online" : "Attention";
+      $("healthText").style.color = health.ok ? "#b9f2d3" : "#ffd39b";
+      $("lastUpdate").textContent = health.latest_timestamp ? new Date(health.latest_timestamp).toLocaleTimeString() : "--";
+      $("recordCount").textContent = health.records_in_memory;
+    }
+
+    function renderCurrent(current, displayRow) {
+      if (!displayRow || !displayRow.prediction) return;
+      const p = displayRow.prediction;
+      const statusColor = colors[p.status] || "var(--amber)";
+      $("status").textContent = p.status === "ALERT" ? "Quality risk active" : p.status === "WATCH" ? "Watch condition" : p.status === "DATA_LOSS" ? "Data loss" : "Stable operation";
+      $("status").style.color = statusColor;
+      $("freeLime").textContent = `${p.predicted_free_lime_pct.toFixed(2)}%`;
+      $("literWeight").textContent = `${Math.round(p.predicted_liter_weight_g_per_l)} g/L`;
+      $("risk").textContent = `${p.off_spec_risk_pct}%`;
+      $("confidence").textContent = `${p.confidence_pct}%`;
+      $("leadTime").textContent = selectedForecastMinutes ? `${selectedForecastMinutes}m` : `${p.warning_horizon_minutes}m`;
+      setPill("flPill", p.predicted_free_lime_pct >= config.free_lime_high_limit_pct ? "high" : "ok", p.predicted_free_lime_pct >= config.free_lime_high_limit_pct ? "var(--red)" : "var(--green)");
+      setPill("lwPill", p.predicted_liter_weight_g_per_l <= config.liter_weight_low_limit_g_per_l ? "low" : "ok", p.predicted_liter_weight_g_per_l <= config.liter_weight_low_limit_g_per_l ? "var(--red)" : "var(--green)");
+      setPill("riskPill", p.status.toLowerCase(), statusColor);
+      setPill("confidencePill", p.confidence_pct >= 80 ? "strong" : "limited", p.confidence_pct >= 80 ? "var(--blue)" : "var(--amber)");
+      renderDrivers(p.drivers || []);
+      renderRecommendations(p.recommendations || []);
+      renderProcess(current.process || {});
+    }
+
+    function renderHome(row, health) {
+      if (!row || !row.prediction) return;
+      const p = row.prediction;
+      const c = row.conversion || {};
+      const combined = combinedPlatformStatus(p.status, c.status);
+      const statusColor = colors[combined] || "var(--amber)";
+      const condition = combined === "ALERT" ? "Action needed" : combined === "WATCH" ? "Watch closely" : combined === "DATA_LOSS" ? "Data problem" : "Good condition";
+      const horizon = selectedForecastMinutes ? `${selectedForecastMinutes} minutes ahead` : "latest live condition";
+      $("homeCondition").textContent = condition;
+      $("homeCondition").style.color = statusColor;
+      $("homeConditionCard").style.borderColor = statusColor;
+      $("homeHorizonLabel").textContent = selectedForecastMinutes ? `Platform forecast: ${horizon}` : "Live plant condition";
+      $("homeConditionText").textContent = platformConditionText(p.status, c.status, horizon);
+      $("homeFreeLime").textContent = `${p.predicted_free_lime_pct.toFixed(2)}%`;
+      $("homeLiterWeight").textContent = `${Math.round(p.predicted_liter_weight_g_per_l)} g/L`;
+      $("homeRisk").textContent = `${p.off_spec_risk_pct}%`;
+      $("homeConversionGap").textContent = c.conversion_gap_tpd != null ? `${Math.round(c.conversion_gap_tpd)} t/d` : "--";
+      $("homeActions").innerHTML = platformActions(p, c).map((action, index) => `
+        <div class="plain-action">
+          <i>${index + 1}</i>
+          <div><strong>${action.title}</strong><span>${action.body}</span></div>
+        </div>
+      `).join("");
+      $("homeTimeScaleLabel").textContent = selectedForecastMinutes ? `Showing forecast for ${horizon}` : "Showing latest live condition";
+      $("homeFeed").textContent = health.latest_timestamp ? new Date(health.latest_timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "--";
+      $("homeLeadTime").textContent = selectedForecastMinutes ? `${selectedForecastMinutes}m` : `${p.warning_horizon_minutes}m`;
+      $("homeConfidence").textContent = `${p.confidence_pct}%`;
+      setPill("homeConfidencePill", p.confidence_pct >= 80 ? "strong" : "limited", p.confidence_pct >= 80 ? "var(--blue)" : "var(--amber)");
+      const topDriver = p.drivers?.[0]?.name || "None";
+      const topLoss = c.top_loss?.name;
+      $("homeConcern").textContent = mainConcern(p, c, topDriver, topLoss);
+      $("homeConcernPill").style.background = statusColor;
+      $("homeFeedPill").textContent = health.ok ? "online" : "check";
+      $("homeFeedPill").style.background = health.ok ? "var(--green)" : "var(--amber)";
+      $("status").textContent = condition;
+      $("status").style.color = statusColor;
+    }
+
+    function combinedPlatformStatus(qualityStatus, conversionStatus) {
+      if (qualityStatus === "DATA_LOSS") return "DATA_LOSS";
+      if (qualityStatus === "ALERT" || conversionStatus === "ALERT") return "ALERT";
+      if (qualityStatus === "WATCH" || conversionStatus === "WATCH") return "WATCH";
+      return "NORMAL";
+    }
+
+    function platformConditionText(qualityStatus, conversionStatus, horizon) {
+      if (qualityStatus === "DATA_LOSS") return "The system is not receiving reliable live data. Check the plant data connection before trusting the forecast.";
+      if (qualityStatus === "ALERT" && conversionStatus === "ALERT") return `Both clinker quality and cement conversion show action risk for ${horizon}. Review quality actions and conversion bottlenecks together.`;
+      if (qualityStatus === "ALERT") return `Clinker quality risk is active for ${horizon}. Stabilize quality before it affects cement production or dispatch decisions.`;
+      if (conversionStatus === "ALERT") return `Cement conversion gap is high for ${horizon}. Focus on the top bottleneck preventing clinker from becoming cement output.`;
+      if (qualityStatus === "WATCH" || conversionStatus === "WATCH") return `The plant is in watch condition for ${horizon}. Stabilize the highlighted quality or conversion issue before it becomes a larger gap.`;
+      return `Clinker quality and cement conversion are inside the current limits for ${horizon}. Continue normal monitoring.`;
+    }
+
+    function platformActions(prediction, conversion) {
+      const actions = [];
+      const qualityActions = plainActions(prediction);
+      const conversionActions = (conversion.action_plan || fallbackActionPlan(conversion || {})).map(item => ({
+        title: "Reduce conversion gap",
+        body: item.action
+      }));
+      if (prediction.status === "ALERT" || prediction.status === "WATCH") actions.push(...qualityActions.slice(0, 2));
+      if (conversion.status === "ALERT" || conversion.status === "WATCH") actions.push(...conversionActions.slice(0, 2));
+      if (!actions.length) {
+        actions.push({ title: "Keep monitoring", body: "Quality and conversion are inside the current watch bands." });
+        if (qualityActions[0]) actions.push(qualityActions[0]);
+      }
+      return actions.slice(0, 4);
+    }
+
+    function mainConcern(prediction, conversion, topDriver, topLoss) {
+      if ((conversion.conversion_gap_tpd || 0) > 0 && (conversion.status === "ALERT" || conversion.status === "WATCH")) return simplifyLossName(topLoss || "Conversion gap");
+      if (prediction.status === "ALERT" || prediction.status === "WATCH") return shortConcern(topDriver);
+      if (topLoss && (conversion.conversion_gap_tpd || 0) > 0) return simplifyLossName(topLoss);
+      return shortConcern(topDriver);
+    }
+
+    function renderConversion(row) {
+      if (!row || !row.conversion) return;
+      const c = row.conversion;
+      const p = row.process || {};
+      const statusColor = colors[c.status] || "var(--amber)";
+      $("conversionStatus").textContent = c.status === "ALERT" ? "Gap needs action" : c.status === "WATCH" ? "Conversion watch" : "Conversion stable";
+      $("conversionStatus").style.color = statusColor;
+      $("expectedCement").textContent = `${Math.round(c.expected_cement_tpd)} t/d`;
+      $("actualCement").textContent = `${Math.round(c.actual_cement_tpd)} t/d`;
+      $("conversionGap").textContent = `${Math.round(c.conversion_gap_tpd)} t/d`;
+      $("conversionEfficiency").textContent = `${c.conversion_efficiency_pct}%`;
+      $("topLoss").textContent = simplifyLossName(c.top_loss?.name || "--");
+      setPill("actualCementPill", c.status.toLowerCase(), statusColor);
+      setPill("gapPill", c.status === "NORMAL" ? "ok" : "gap", statusColor);
+      setPill("efficiencyPill", c.conversion_efficiency_pct >= 88 ? "good" : c.conversion_efficiency_pct >= 75 ? "watch" : "low", c.conversion_efficiency_pct >= 88 ? "var(--green)" : c.conversion_efficiency_pct >= 75 ? "var(--amber)" : "var(--red)");
+      $("topLossPill").style.background = statusColor;
+      renderLossBridge(c.losses || []);
+      renderFramework(c.framework || fallbackFramework(c));
+      renderDailyReview(c.daily_review || fallbackDailyReview(c, p));
+      renderLossTree(c.loss_tree || fallbackLossTree(c.losses || []));
+      renderActionPlan(c.action_plan || fallbackActionPlan(c));
+      $("conversionActions").innerHTML = (c.recommendations || []).slice(0, 5).map((note, index) => `
+        <div class="item" style="border-left-color:${index === 0 ? statusColor : "var(--teal)"}">
+          <strong>${index === 0 ? "Primary conversion action" : "Supporting check"}</strong><span>${note}</span>
+        </div>
+      `).join("");
+      $("conversionRows").innerHTML = `<tr>
+        <td>${fmt(p.cement_mill_runtime_pct)}%</td>
+        <td>${fmt(p.grinding_rate_tph)} tph</td>
+        <td>${fmt(p.clinker_feed_tph)} tph</td>
+        <td>${fmt(p.additive_availability_pct)}%</td>
+        <td>${fmt(p.power_available_pct)}%</td>
+        <td>${fmt(p.cement_silo_utilization_pct)}%</td>
+        <td>${fmt(p.packing_rate_tph)} tph</td>
+        <td>${fmt(p.dispatch_truck_availability_pct)}%</td>
+        <td>${fmt(p.planning_alignment_pct)}%</td>
+      </tr>`;
+    }
+
+    function renderFramework(framework) {
+      if (!framework) {
+        $("conversionFramework").innerHTML = `<div class="item"><strong>Waiting for conversion data</strong><span>Restart the backend service if this remains empty.</span></div>`;
+        return;
+      }
+      const rows = [
+        ["Available clinker", `${Math.round(framework.clinker_available_tpd)} t/d`],
+        ["Clinker factor", `${framework.clinker_factor_pct}%`],
+        ["Theoretical cement from clinker", `${Math.round(framework.theoretical_cement_from_clinker_tpd)} t/d`],
+        ["Planned cement", `${Math.round(framework.planned_cement_tpd)} t/d`],
+        ["Actual cement", `${Math.round(framework.actual_cement_tpd)} t/d`],
+        ["Conversion gap", `${Math.round(framework.conversion_gap_tpd)} t/d`]
+      ];
+      $("conversionFramework").innerHTML = rows.map(([label, value]) => `
+        <div class="framework-line"><span>${label}</span><strong>${value}</strong></div>
+      `).join("") + `<div class="item"><strong>Framework logic</strong><span>${framework.formula}</span></div>`;
+    }
+
+    function renderDailyReview(review) {
+      if (!review) {
+        $("dailyReview").innerHTML = `<div class="item"><strong>Waiting for daily review</strong><span>Restart the backend service if this remains empty.</span></div>`;
+        return;
+      }
+      const top = (review.top_losses || []).map(item => `${item.name}: ${Math.round(item.tons_lost)} t/d`).join("<br>");
+      const watch = (review.watch_items || []).join("<br>");
+      $("dailyReview").innerHTML = `
+        <div class="item"><strong>Target vs actual</strong><span>${review.target_vs_actual}</span></div>
+        <div class="item"><strong>Total gap</strong><span>${Math.round(review.total_gap_tpd)} t/d</span></div>
+        <div class="item"><strong>Top 3 losses</strong><span>${top}</span></div>
+        <div class="item"><strong>Watch items</strong><span>${watch}</span></div>
+        <div class="item"><strong>Meeting prompt</strong><span>${review.meeting_prompt}</span></div>
+      `;
+    }
+
+    function renderLossTree(tree) {
+      if (!tree.length) {
+        $("lossTreeRows").innerHTML = `<tr><td colspan="5">Waiting for loss tree data. Restart the backend service if this remains empty.</td></tr>`;
+        return;
+      }
+      $("lossTreeRows").innerHTML = tree.slice(0, 9).map(item => `
+        <tr>
+          <td>${item.loss}</td>
+          <td>${item.owner}</td>
+          <td>${(item.root_causes || []).slice(0, 3).join("; ")}</td>
+          <td>${(item.evidence_to_check || []).slice(0, 3).join("; ")}</td>
+          <td>${item.recommended_action || actionForLoss(item.loss)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderActionPlan(actions) {
+      if (!actions.length) {
+        $("actionPlanRows").innerHTML = `<tr><td colspan="4">Waiting for action plan data. Restart the backend service if this remains empty.</td></tr>`;
+        return;
+      }
+      $("actionPlanRows").innerHTML = actions.map(item => `
+        <tr>
+          <td>${item.owner}</td>
+          <td>${item.action}</td>
+          <td>${item.due}</td>
+          <td>${item.status}</td>
+        </tr>
+      `).join("");
+    }
+
+    function fallbackFramework(c) {
+      const expected = Number(c.expected_cement_tpd || 0);
+      const actual = Number(c.actual_cement_tpd || 0);
+      const gap = Number(c.conversion_gap_tpd || Math.max(0, expected - actual));
+      const clinkerFactor = 72;
+      const clinkerAvailable = expected ? expected * 0.72 * 1.08 : 0;
+      return {
+        clinker_available_tpd: clinkerAvailable,
+        clinker_factor_pct: clinkerFactor,
+        theoretical_cement_from_clinker_tpd: clinkerAvailable / 0.72,
+        planned_cement_tpd: expected,
+        actual_cement_tpd: actual,
+        conversion_gap_tpd: gap,
+        formula: "Available clinker / clinker factor gives cement potential. Runtime, rate, feed, additive, power, silo, packing, dispatch and planning losses are subtracted to reach actual cement."
+      };
+    }
+
+    function fallbackDailyReview(c, process) {
+      const expected = Number(c.expected_cement_tpd || 0);
+      const actual = Number(c.actual_cement_tpd || 0);
+      const gap = Number(c.conversion_gap_tpd || Math.max(0, expected - actual));
+      return {
+        target_vs_actual: `${Math.round(expected)} t/d target vs ${Math.round(actual)} t/d actual`,
+        total_gap_tpd: gap,
+        top_losses: (c.losses || []).slice(0, 3),
+        watch_items: [
+          `Mill runtime ${fmt(process.cement_mill_runtime_pct)}%`,
+          `Grinding rate ${fmt(process.grinding_rate_tph)} tph`,
+          `Silo utilization ${fmt(process.cement_silo_utilization_pct)}%`,
+          `Packing rate ${fmt(process.packing_rate_tph)} tph`,
+          `Truck availability ${fmt(process.dispatch_truck_availability_pct)}%`
+        ],
+        meeting_prompt: "Review the top three losses, confirm evidence, assign owner, agree action and due time before next shift review."
+      };
+    }
+
+    function fallbackLossTree(losses) {
+      const rootCauses = {
+        "Mill downtime": ["Mechanical breakdown", "Electrical trip", "Maintenance overrun"],
+        "Low grinding rate": ["Hard clinker", "Separator issue", "Low ventilation"],
+        "No clinker feed": ["Low bin level", "Belt/elevator stoppage", "Feeder fault"],
+        "Additive shortage": ["Gypsum shortage", "Additive feeder trip", "Wrong cement type additive not ready"],
+        "Power restriction": ["Load shedding", "Generator limitation", "Voltage instability"],
+        "Silo full": ["Inflow higher than outflow", "Wrong silo selected", "Dispatch/packing too slow"],
+        "Packing bottleneck": ["Packer fault", "Bag shortage", "Loading bay congestion"],
+        "Dispatch/truck constraint": ["Truck shortage", "Weighbridge congestion", "Loading schedule mismatch"],
+        "Planning mismatch": ["Wrong product sequence", "Silo allocation conflict", "Demand change"]
+      };
+      const owners = {
+        "Mill downtime": "Mechanical / Electrical / Production",
+        "Low grinding rate": "Process / Production",
+        "No clinker feed": "Production / Mechanical",
+        "Additive shortage": "Stores / Procurement / Production",
+        "Power restriction": "Electrical / Utilities",
+        "Silo full": "Production / Dispatch / Packing",
+        "Packing bottleneck": "Packing Plant / Mechanical",
+        "Dispatch/truck constraint": "Logistics / Dispatch / Sales",
+        "Planning mismatch": "Production Planning / Sales"
+      };
+      return losses.map(item => ({
+        loss: item.name,
+        owner: owners[item.name] || "Production",
+        root_causes: rootCauses[item.name] || ["Review shift log", "Check SCADA trend", "Confirm owner feedback"],
+        evidence_to_check: evidenceForLoss(item.name),
+        recommended_action: actionForLoss(item.name)
+      }));
+    }
+
+    function evidenceForLoss(name) {
+      const evidence = {
+        "Mill downtime": ["running hours", "stoppage log", "trip history"],
+        "Low grinding rate": ["tph trend", "mill power", "separator speed"],
+        "No clinker feed": ["bin level", "belt status", "feeder speed"],
+        "Additive shortage": ["stock level", "feeder speed", "cement schedule"],
+        "Power restriction": ["power trend", "load shedding log", "voltage trend"],
+        "Silo full": ["silo level trend", "inflow/outflow", "silo route"],
+        "Packing bottleneck": ["packer runtime", "bag stock", "loading rate"],
+        "Dispatch/truck constraint": ["truck queue", "weighbridge rate", "loading tickets"],
+        "Planning mismatch": ["daily plan", "product sequence", "silo allocation"]
+      };
+      return evidence[name] || ["shift log", "SCADA trend", "operator comment"];
+    }
+
+    function actionForLoss(name) {
+      const actions = {
+        "Mill downtime": "Restore mill availability; confirm whether stop is mechanical, electrical, planned, or interlock-related.",
+        "Low grinding rate": "Optimize mill rate by checking separator, ventilation, grinding media/liners, feed size, and clinker grindability.",
+        "No clinker feed": "Restore stable clinker feed by checking bin level, belts, elevators, feeders, and chute blockages.",
+        "Additive shortage": "Secure required additive stock and confirm feeder readiness for the active cement type.",
+        "Power restriction": "Coordinate power/load priority and agree whether mill load should be reduced or production rescheduled.",
+        "Silo full": "Open evacuation path through silo selection, extraction, packing, dispatch, or product changeover.",
+        "Packing bottleneck": "Recover packing/loading capacity by checking packers, bags, loaders, spouts, and bay congestion.",
+        "Dispatch/truck constraint": "Escalate truck, weighbridge, loading schedule, and customer pickup constraints.",
+        "Planning mismatch": "Realign product sequence, silo allocation, sales demand, additives, and dispatch plan."
+      };
+      return actions[name] || "Confirm evidence, assign owner, and agree corrective action for next review.";
+    }
+
+    function fallbackActionPlan(c) {
+      const top = c.top_loss?.name || c.losses?.[0]?.name || "";
+      const owner = fallbackLossTree([{ name: top }])[0]?.owner || "Shift team";
+      const actionMap = {
+        "Mill downtime": "Restore cement mill availability; confirm whether the stop is mechanical, electrical, planned, or interlock-related.",
+        "Low grinding rate": "Check mill performance, separator, ventilation, feedability, and clinker grindability.",
+        "No clinker feed": "Check clinker bin level, transport, feeder, chute blockage, and feed continuity.",
+        "Additive shortage": "Confirm additive stock, feeder readiness, and cement type plan.",
+        "Power restriction": "Coordinate power availability and load priorities.",
+        "Silo full": "Open evacuation path through silo planning, packing, dispatch, or product changeover.",
+        "Packing bottleneck": "Check packer availability, bag supply, loader status, and loading bay congestion.",
+        "Dispatch/truck constraint": "Escalate truck availability, weighbridge, loading, and dispatch planning constraints.",
+        "Planning mismatch": "Align product mix, silo availability, sales demand, and mill production sequence."
+      };
+      return [{ owner, action: actionMap[top] || "Review top conversion constraint and assign owner.", due: "Current shift", status: "Open" }];
+    }
+
+    function renderLossBridge(losses) {
+      const max = Math.max(1, ...losses.map(item => item.tons_lost || 0));
+      $("lossBridge").innerHTML = losses.map((item, index) => `
+        <div class="bridge-row">
+          <strong>${item.name}</strong><span>${Math.round(item.tons_lost)} t/d</span>
+          <div class="bar"><i style="width:${Math.round((item.tons_lost / max) * 100)}%; background:${index === 0 ? "var(--red)" : index < 3 ? "var(--amber)" : "var(--teal)"}"></i></div>
+          <div class="bridge-note">${item.cause}</div>
+        </div>
+      `).join("");
+    }
+
+    function simplifyLossName(name) {
+      return name
+        .replace("Dispatch/truck constraint", "Dispatch")
+        .replace("Packing bottleneck", "Packing")
+        .replace("Planning mismatch", "Planning")
+        .replace("Low grinding rate", "Low rate")
+        .replace("No clinker feed", "No feed");
+    }
+
+    function conditionText(status, horizon) {
+      if (status === "ALERT") return `The forecast for ${horizon} shows clinker quality may move outside target. Take the recommended action now and keep watching the next update.`;
+      if (status === "WATCH") return `The forecast for ${horizon} is still usable, but the kiln condition is moving toward a warning zone. Stabilize before it becomes off-spec.`;
+      if (status === "DATA_LOSS") return "The system is not receiving reliable live data. Check the plant data connection before trusting the forecast.";
+      return `The forecast for ${horizon} is inside the selected quality limits. Continue normal monitoring.`;
+    }
+
+    function plainActions(prediction) {
+      const notes = prediction.recommendations || [];
+      if (!notes.length) return [{ title: "Keep monitoring", body: "No immediate action is required from the current signal." }];
+      return notes.slice(0, 3).map(note => {
+        if (note.includes("free lime")) return { title: "Protect burning quality", body: "Stabilize kiln burning and check feed loading before the next lab result." };
+        if (note.includes("liter weight")) return { title: "Check clinker formation", body: "Review cooler bed condition, nodules, and burning stability." };
+        if (note.includes("LSF")) return { title: "Check raw meal chemistry", body: "Confirm the raw meal correction and quality sample before further changes." };
+        if (note.includes("Burning zone")) return { title: "Stabilize kiln heat", body: "Check flame, fuel feed, and draft stability." };
+        if (note.includes("Secondary air")) return { title: "Improve heat recovery", body: "Check cooler grate speed, bed depth, and fan balance." };
+        if (note.includes("moisture")) return { title: "Check fuel condition", body: "Verify fuel moisture and drying condition." };
+        return { title: "Continue monitoring", body: note };
+      });
+    }
+
+    function shortConcern(name) {
+      return name
+        .replace("Raw meal LSF pressure", "Raw meal LSF")
+        .replace("Burning zone heat deficit", "Kiln heat")
+        .replace("Secondary air weakness", "Secondary air")
+        .replace("Cooler/grate instability", "Cooler")
+        .replace("Fuel and moisture effect", "Fuel")
+        .replace("Kiln feed loading", "Feed rate")
+        .replace("SM/AM chemistry balance", "Chemistry")
+        .replace("Process swings", "Instability");
+    }
+
+    function updateTrendControls() {
+      document.querySelectorAll("[data-minutes]").forEach(button => {
+        button.classList.toggle("active", Number(button.dataset.minutes) === selectedForecastMinutes);
+      });
+      $("trendModeLabel").textContent = selectedForecastMinutes
+        ? `${selectedForecastMinutes}-minute forward forecast from latest live condition`
+        : "Last 144 live predictions";
+      $("trendAxisLabel").textContent = selectedForecastMinutes
+        ? "X-axis: forecast time ahead | Y-axis: free lime %, scaled risk"
+        : "X-axis: live prediction time | Y-axis: free lime %, scaled risk";
+    }
+
+    function setPill(id, text, color) {
+      $(id).textContent = text;
+      $(id).style.background = color;
+    }
+
+    function renderDrivers(drivers) {
+      const max = Math.max(0.01, ...drivers.map(d => d.score));
+      $("drivers").innerHTML = drivers.slice(0, 6).map((d, index) => `
+        <div class="driver">
+          <strong>${d.name}</strong><span>${d.detail}</span>
+          <div class="bar"><i style="width:${Math.round((d.score / max) * 100)}%; background:${index < 2 ? "var(--red)" : index < 4 ? "var(--amber)" : "var(--teal)"}"></i></div>
+        </div>
+      `).join("");
+    }
+
+    function renderRecommendations(recommendations) {
+      $("recommendations").innerHTML = recommendations.map((note, index) => `
+        <div class="item" style="border-left-color:${index === 0 ? "var(--teal)" : "var(--blue)"}">
+          <strong>${index === 0 ? "Primary action" : "Supporting check"}</strong><span>${note}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderProcess(process) {
+      const rows = [
+        ["Burning zone", `${Math.round(process.burning_zone_temp_c)} degC`],
+        ["Kiln feed", `${Math.round(process.kiln_feed_tph)} tph`],
+        ["Fuel rate", `${process.fuel_rate_tph?.toFixed(2)} tph`],
+        ["Secondary air", `${Math.round(process.secondary_air_temp_c)} degC`],
+        ["Cooler grate", `${Math.round(process.cooler_grate_speed_pct)}%`],
+        ["Raw meal LSF", process.raw_meal_lsf?.toFixed(2)],
+        ["Fuel moisture", `${process.fuel_moisture_pct?.toFixed(2)}%`]
+      ];
+      $("processValues").innerHTML = rows.map(([name, value]) => `<div class="item"><strong>${name}</strong><span>${value}</span></div>`).join("");
+    }
+
+    function buildTrendRows(rows, minutes) {
+      if (!minutes || rows.length === 0) return rows;
+      const latest = rows[rows.length - 1];
+      const previous = rows[Math.max(0, rows.length - 6)];
+      const steps = Math.max(1, Math.round(minutes / 15));
+      const latestFreeLime = latest.prediction.predicted_free_lime_pct;
+      const previousFreeLime = previous.prediction.predicted_free_lime_pct;
+      const latestRisk = latest.prediction.off_spec_risk_pct;
+      const previousRisk = previous.prediction.off_spec_risk_pct;
+      const latestLiterWeight = latest.prediction.predicted_liter_weight_g_per_l;
+      const divisor = Math.max(1, rows.length - rows.indexOf(previous) - 1);
+      const freeLimeSlope = (latestFreeLime - previousFreeLime) / divisor;
+      const riskSlope = (latestRisk - previousRisk) / divisor;
+      const pressure = Math.max(0, latestRisk - 35) / 65 + Math.max(0, latestFreeLime - config.free_lime_high_limit_pct + 0.2);
+      const projected = [latest];
+      const start = new Date(latest.timestamp);
+      for (let step = 1; step <= steps; step++) {
+        const forecastTime = new Date(start.getTime() + step * 15 * 60000);
+        const predictedFreeLime = clamp(latestFreeLime + freeLimeSlope * step + pressure * 0.035 * step, 0.25, 4.8);
+        const predictedRisk = Math.round(clamp(latestRisk + riskSlope * step + pressure * 4 * step, 2, 99));
+        const predictedLiterWeight = clamp(latestLiterWeight - Math.max(0, predictedFreeLime - latestFreeLime) * 90 - pressure * 6 * step, 980, 1325);
+        projected.push({
+          ...latest,
+          timestamp: forecastTime.toISOString(),
+          prediction: {
+            ...latest.prediction,
+            predicted_free_lime_pct: predictedFreeLime,
+            predicted_liter_weight_g_per_l: predictedLiterWeight,
+            off_spec_risk_pct: predictedRisk,
+            status: predictedRisk >= config.off_spec_risk_alert_pct || predictedFreeLime >= config.free_lime_high_limit_pct ? "ALERT" : predictedRisk >= config.off_spec_risk_alert_pct - 20 ? "WATCH" : "NORMAL"
+          }
+        });
+      }
+      return projected;
+    }
+
+    function drawTrend(rows) {
+      const canvas = $("trend");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      const pad = { left: 50, right: 24, top: 20, bottom: 40 };
+      const values = rows.flatMap(row => [row.prediction.predicted_free_lime_pct, row.prediction.off_spec_risk_pct / 45]);
+      const min = 0;
+      const max = Math.max(2.8, ...values, config.free_lime_high_limit_pct + 0.4);
+      const x = i => pad.left + (i / Math.max(1, rows.length - 1)) * (w - pad.left - pad.right);
+      const y = v => pad.top + (1 - (v - min) / (max - min)) * (h - pad.top - pad.bottom);
+
+      ctx.strokeStyle = "#d8ded4";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const yy = pad.top + i * (h - pad.top - pad.bottom) / 4;
+        ctx.moveTo(pad.left, yy);
+        ctx.lineTo(w - pad.right, yy);
+      }
+      ctx.stroke();
+
+      drawLine(ctx, rows.map(row => row.prediction.predicted_free_lime_pct), x, y, "#2a7886", 4);
+      drawLine(ctx, rows.map(row => row.prediction.off_spec_risk_pct / 45), x, y, "#b56b16", 3);
+
+      ctx.setLineDash([8, 6]);
+      drawLine(ctx, rows.map(() => config.free_lime_high_limit_pct), x, y, "#b54134", 2);
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#5d6861";
+      ctx.font = "13px system-ui";
+      ctx.fillText("free lime %", 10, pad.top + 5);
+      ctx.fillText("risk scaled", 10, pad.top + 24);
+      ctx.fillStyle = "#2a7886";
+      ctx.fillText("Free lime", w - 165, 25);
+      ctx.fillStyle = "#b56b16";
+      ctx.fillText("Off-spec risk", w - 165, 45);
+      ctx.fillStyle = "#5d6861";
+      ctx.fillText(selectedForecastMinutes ? "now" : timeLabel(rows[0]?.timestamp), pad.left, h - 14);
+      ctx.fillText(selectedForecastMinutes ? `+${selectedForecastMinutes}m` : timeLabel(rows[rows.length - 1]?.timestamp), w - 88, h - 14);
+    }
+
+    function drawLine(ctx, values, x, y, color, width) {
+      if (!values.length) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      values.forEach((value, i) => i ? ctx.lineTo(x(i), y(value)) : ctx.moveTo(x(i), y(value)));
+      ctx.stroke();
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function timeLabel(value) {
+      if (!value) return "--";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "--" : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function fmt(value) {
+      return Number.isFinite(value) ? Number(value).toFixed(1) : "--";
+    }
+
+    function drawTable(rows) {
+      $("rows").innerHTML = rows.slice().reverse().slice(0, 80).map(row => {
+        const p = row.prediction;
+        const r = row.process;
+        const color = colors[p.status] || "var(--amber)";
+        return `<tr>
+          <td>${new Date(row.timestamp).toLocaleTimeString()}</td>
+          <td style="color:${color};font-weight:800">${p.status}</td>
+          <td>${p.predicted_free_lime_pct.toFixed(2)}%</td>
+          <td>${Math.round(p.predicted_liter_weight_g_per_l)} g/L</td>
+          <td>${p.off_spec_risk_pct}%</td>
+          <td>${p.confidence_pct}%</td>
+          <td>${Math.round(r.burning_zone_temp_c)}</td>
+          <td>${Math.round(r.kiln_feed_tph)}</td>
+          <td>${r.fuel_rate_tph.toFixed(2)}</td>
+          <td>${Math.round(r.secondary_air_temp_c)}</td>
+          <td>${r.raw_meal_lsf.toFixed(2)}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    document.querySelectorAll("#trendControls button").forEach(button => {
+      button.addEventListener("click", () => {
+        selectedForecastMinutes = Number(button.dataset.minutes);
+        updateTrendControls();
+        const trendRows = buildTrendRows(history, selectedForecastMinutes);
+        const displayRow = trendRows[trendRows.length - 1];
+        if (displayRow) {
+          renderCurrent(history[history.length - 1], displayRow);
+          renderHome(displayRow, { ok: true, latest_timestamp: history[history.length - 1]?.timestamp });
+        }
+        drawTrend(trendRows);
+      });
+    });
+
+    document.querySelectorAll("#homeTrendControls button").forEach(button => {
+      button.addEventListener("click", () => {
+        selectedForecastMinutes = Number(button.dataset.minutes);
+        updateTrendControls();
+        const trendRows = buildTrendRows(history, selectedForecastMinutes);
+        const displayRow = trendRows[trendRows.length - 1];
+        if (displayRow) {
+          renderCurrent(history[history.length - 1], displayRow);
+          renderHome(displayRow, { ok: true, latest_timestamp: history[history.length - 1]?.timestamp });
+        }
+        drawTrend(trendRows);
+      });
+    });
+
+    document.querySelectorAll("[data-view]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-view]").forEach(item => item.classList.toggle("active", item === button));
+        document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === button.dataset.view));
+        if (button.dataset.view === "dashboardView") drawTrend(buildTrendRows(history, selectedForecastMinutes));
+      });
+    });
+
+    boot();
+  </script>
+</body>
+</html>

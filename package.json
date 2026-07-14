@@ -1,0 +1,12 @@
+{
+  "name": "realtime-clinker-quality-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time clinker quality prediction scaffold for SCADA/historian integration.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
