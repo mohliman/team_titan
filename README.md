@@ -1,68 +1,53 @@
-# Real-Time Cement Production Intelligence Platform
+# Cement Production Intelligence
 
-This is a real-time-ready MVP scaffold for predicting high free lime/off-spec clinker and diagnosing clinker-to-cement production conversion gaps.
+A Node.js and browser dashboard prototype for exploring clinker quality and cement production-conversion gaps with **simulated process data**.
 
-## Run
+## What it demonstrates
 
-```powershell
-cd outputs\realtime-clinker-platform
+- A periodic data-collection loop with simulated kiln and downstream production variables.
+- Rule-based free-lime, liter-weight, and off-spec estimates, with explanatory driver scores.
+- A clinker-to-cement conversion bridge and ranked opportunity-loss categories.
+- A browser dashboard with current conditions, history, loss explanations, and action-plan suggestions.
+- JSONL history storage and a tag-mapping configuration for future read-only process-data adapters.
+
+The estimates and confidence scores are illustrative heuristics. They have not been validated against plant measurements, and this prototype is not a production control or safety system.
+
+## Stack and structure
+
+Node.js built-in HTTP and filesystem modules · HTML · JavaScript · JSON / JSONL
+
+| Path | Responsibility |
+| --- | --- |
+| `server.js` | Simulator, periodic collection, calculations, API routes, and static serving |
+| `public/index.html` | Browser dashboard |
+| `config/tag-map.json` | Source mode, thresholds, collection interval, and tag mapping |
+| `data/prediction-history.jsonl` | Append-only local history |
+
+## Run locally
+
+Use Node.js 24 and npm. There are no external runtime dependencies to install.
+
+```sh
 npm start
 ```
 
-Then open:
+Open `http://localhost:8787`. The server reads `PORT` from the environment and defaults to 8787. Keep `source_mode` set to `simulator` unless you implement the adapter.
 
-```text
-http://localhost:8787
-```
+## API
 
-## What It Includes
+| Route | Response |
+| --- | --- |
+| `/api/current` | Latest process snapshot and estimates |
+| `/api/history` | Recent history, up to 144 records |
+| `/api/config` | Dashboard configuration |
+| `/api/health` | Collection status, source mode, latest timestamp, and in-memory history count |
 
-- Live data collector loop
-- Simulated SCADA/historian source
-- Prediction service for free lime, liter weight, and off-spec risk
-- Clinker-to-cement conversion bridge
-- Cement-equivalent opportunity loss analysis
-- JSONL history storage
-- Live browser dashboard
-- Tag mapping file for later plant integration
+## Conversion bridge
 
-## How To Connect Real SCADA Later
+The dashboard compares expected cement output with actual output and ranks contributing constraints: mill downtime, grinding rate, clinker feed, additives, power, silo capacity, packing, dispatch, and planning. Values represent cement-equivalent opportunity losses, not necessarily physical material losses.
 
-Edit `config/tag-map.json` to match the real plant tag names, then replace the simulator function inside `server.js` with an adapter for:
+## Integration and limitations
 
-- OPC UA
-- PI historian
-- SQL historian
-- MQTT
-- Vendor API
+`readScadaSnapshot()` is an unimplemented adapter. A future integration would map approved read-only OPC UA, historian, SQL, MQTT, or vendor API data to the expected fields in `config/tag-map.json`.
 
-Start with read-only access. Do not write kiln setpoints from this platform until it has passed process control and safety validation.
-
-## Conversion Bridge Module
-
-The conversion bridge explains why expected cement production may not become actual cement output, even when clinker is available. These are opportunity losses measured as cement-equivalent tons per day, not necessarily physical material losses.
-
-Current loss categories:
-
-- Mill downtime
-- Low grinding rate
-- No clinker feed
-- Additive shortage
-- Power restriction
-- Silo full
-- Packing bottleneck
-- Dispatch/truck constraint
-- Planning mismatch
-
-The dashboard has a `Conversion bridge` view showing expected cement, actual cement, conversion gap, efficiency, top loss, ranked loss bars, recommended actions, and current conversion variables.
-
-Challenge 3 deliverables now represented in the app:
-
-- Clinker-to-cement conversion framework
-- Loss bridge
-- Loss tree with likely root-cause hypotheses
-- Daily plant review summary
-- Action plan with owners by system
-- Current conversion variables for mill, additive, power, silo, packing, dispatch, and planning constraints
-
-The Home status page now summarizes the whole platform: clinker quality, cement conversion gap, live feed health, confidence, main concern, and recommended actions.
+No plant connection or kiln-setpoint control is implemented. Action plans and forecasts are prototype explanations, not validated operational instructions. There is no authentication or automated test suite. The dashboard should be evaluated using simulated or sample data.
